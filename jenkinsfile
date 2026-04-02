@@ -1,1 +1,44 @@
-jenkin
+pipeline {
+    agent {agent slave}
+
+    tools {
+        jdk 'JDK21'
+        maven 'Maven'
+    }
+
+    triggers {
+        githubPush()          // Webhook trigger
+        pollSCM('H/2 * * * *') // Poll every 2 minutes
+    }
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/dcneeraj054-arch/spring-petclini.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying to Tomcat..."
+                // Add deploy commands here
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build Successful!"
+        }
+        failure {
+            echo "Build Failed!"
+        }
+    }
+}
